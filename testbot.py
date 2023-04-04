@@ -155,50 +155,6 @@ def cnv(message):
     #response_text += f'✨ Last 24 hours change: {percent_change_24h:.2f}%'
     bot.reply_to(message, response_text)
 
-def generate_sticker(text):
-    # Create a new image with a transparent background
-    size = (512, 512)
-    image = Image.new('RGBA', size, (0, 0, 0, 0))
-
-    # Draw the text onto the image
-    draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype('C:\\Users\\adibn\\OneDrive\\Desktop\\telegram\\Vampire Wars Italic.ttf', size=100)
-    text_color = (255, 255, 255)
-    border_color = (0, 0, 0)
-    border_size = 10
-    words = text.split()
-    y = (size[1] - (len(words) * 100)) / 2
-    for word in words:
-        text_width, text_height = draw.textsize(word, font=font)
-        x = (size[0] - text_width) / 2
-        draw.text((x, y), word, fill=text_color, font=font, stroke_width=border_size, stroke_fill=border_color)
-        y += 100
-
-    # Convert the image to a sticker file
-    sticker_file = BytesIO()
-    image.save(sticker_file, format='PNG')
-    sticker_file.seek(0)
-
-    return sticker_file
-
-
-# Define a function to handle incoming text messages
-@bot.message_handler(commands=['stic'])
-def handle_text_message(message):  
-    # Check if the message has text
-    if len(message.text.split(' ')) > 1:
-        # Get the text from the message command
-        text = message.text.split(' ', 1)[1]
-    else:
-        text = "Bnsl Boy"
-
-
-    # Generate a new sticker from the text
-    sticker_file = generate_sticker(text)
-
-    # Send the new sticker back to the user
-    bot.send_sticker(message.chat.id, sticker_file)
-
 
 # Get live match links
 url = "http://static.cricinfo.com/rss/livescores.xml"
