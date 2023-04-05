@@ -7,7 +7,7 @@ from io import BytesIO
 from bs4 import BeautifulSoup
 
 
-TOKEN = "1638155581:AAF22vq5PfZx1CjQT1guvgspLIY3kmE9z-Y"
+TOKEN = "1638155581:AAGe4dxE4Cz3GXC2NAuHesSAKpeRgwhmQuw"
 
 bot = telebot.TeleBot(TOKEN)
 
