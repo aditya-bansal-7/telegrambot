@@ -234,4 +234,11 @@ def send_match_options(chat_id):
         i += 1
     bot.send_message(chat_id, message)
 
-bot.polling()
+while True:
+    try:
+        # Your bot code here
+        bot.polling(none_stop=True)
+    except Exception as e:
+        print(e)
+        # Wait for a few seconds before restarting the bot
+        time.sleep(5)
