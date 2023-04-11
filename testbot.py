@@ -7,7 +7,7 @@ from io import BytesIO
 from bs4 import BeautifulSoup
 
 
-TOKEN = "5958036642:AAHROQ0gQvouy0npAoqLzL7cl7BgKqEwlm0"
+TOKEN = "1638155581:AAGe4dxE4Cz3GXC2NAuHesSAKpeRgwhmQuw"
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -156,89 +156,97 @@ def cnv(message):
     if result is None:
         bot.reply_to(message, f'Error converting {crypto_amount} {crypto_symbol} to {currency}.')
         return
-    response_text = f'`{crypto_amount}` {crypto_symbol} is worth `{result:.8f}` {currency}.\n\n'
-    response_text += f'✨ {crypto_amount} {crypto_symbol} = {result:.5f} {currency} \n\n'
+    response_text = f'<code>{crypto_amount} {crypto_symbol} is worth {result:.8f} {currency}</code>.\n\n'
+    response_text += f'✨ {crypto_amount} <b>{crypto_symbol}</b> = <code>{result:.5f} {currency}</code> \n\n'
     #response_text += f'✨ Current {crypto_symbol} price: {price:.2f} INR\n'
     #response_text += f'✨ Last 24 hours change: {percent_change_24h:.2f}%'
-    bot.reply_to(message, response_text)
-
-def generate_sticker(text):
+    bot.reply_to(message, response_text, parse_mode="HTML")
+import io
+from PIL import Image, ImageDraw, ImageFont
+def generate_image(text, font_path, font_size, text_color, border_color, border_size,):
     # Create a new image with a transparent background
     size = (512, 512)
     image = Image.new('RGBA', size, (0, 0, 0, 0))
 
     # Draw the text onto the image
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype('C:\\Users\\adibn\\OneDrive\\Desktop\\telegram\\Vampire Wars Italic.ttf', size=100)
-    text_color = (255, 255, 255)
-    border_color = (0, 0, 0)
-    border_size = 10
+    font = ImageFont.truetype(font_path, size=font_size)
+    text = text.replace("kaddu", "luldeep")
     words = text.split()
-    y = (size[1] - (len(words) * 100)) / 2
+    y = (size[1] - (len(words) * font_size)) / 2
+
+
     for word in words:
         text_width, text_height = draw.textsize(word, font=font)
         x = (size[0] - text_width) / 2
         draw.text((x, y), word, fill=text_color, font=font, stroke_width=border_size, stroke_fill=border_color)
-        y += 100
+        y += font_size
+
+    return image
+
+def generate_sticker(text, font_path, font_size=100, text_color=(255, 255, 255), border_color=(0, 0, 0), border_size=10):
+    # Generate the image
+    image = generate_image(text, font_path, font_size, text_color, border_color, border_size)
 
     # Convert the image to a sticker file
-    sticker_file = BytesIO()
+    sticker_file = io.BytesIO()
     image.save(sticker_file, format='PNG')
     sticker_file.seek(0)
 
     return sticker_file
 
-
-# Define a function to handle incoming text messages
 @bot.message_handler(commands=['stic'])
 def handle_text_message(message):  
     # Check if the message has text
+    
     if len(message.text.split(' ')) > 1:
         # Get the text from the message command
         text = message.text.split(' ', 1)[1]
     else:
         text = "Bnsl Boy"
-
-
+    
     # Generate a new sticker from the text
-    sticker_file = generate_sticker(text)
-
+    font_path = 'C:\\Users\\adibn\\OneDrive\\Desktop\\telegram\\Vampire Wars Italic.ttf'
+    sticker_file = generate_sticker(text, font_path)
     # Send the new sticker back to the user
     bot.send_sticker(message.chat.id, sticker_file)
 
-
-# Get live match links
-url = "http://static.cricinfo.com/rss/livescores.xml"
-r = requests.get(url)
-soup = BeautifulSoup(r.text, "lxml")
-
-i = 1
-links = []
-for item in soup.findAll("item"):
-    links.append(item.find("guid").text)
-    i += 1
-
-# Set up handlers for user input
-@bot.message_handler(commands=['cri'])
-def handle_start(message):
-    bot.send_message(message.chat.id, "Live Cricket Score !")
-    send_match_options(message.chat.id)
-
-
-# Helper functions
-def send_match_options(chat_id):
-    message = "Select a match:\n"
-    i = 1
-    for item in soup.findAll("item"):
-        message += "👉  " + item.find("description").text + "\n"
-        i += 1
-    bot.send_message(chat_id, message)
-
-while True:
+@bot.message_handler(commands=['ipl'])
+def send_ipl_scores(message):
     try:
-        # Your bot code here
-        bot.polling(none_stop=True)
-    except Exception as e:
+        # Fetch live scores of ongoing IPL matches
+        url_data = "https://www.cricbuzz.com/cricket-match/live-scores"
+        r = requests.get(url_data)
+        soup = BeautifulSoup(r.content, 'html.parser')
+        div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
+        matches = div.find_all(class_="cb-mtch-lst cb-col cb-col-100 cb-tms-itm")
+        
+        if len(matches) == 0:
+            # No ongoing matches, fetch scores of recently completed matches
+            recent_data = "https://www.cricbuzz.com/cricket-match/live-scores/recent-matches"
+            r = requests.get(recent_data)
+            soup = BeautifulSoup(r.content, 'html.parser')
+            div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
+            if len(matches) == 0:
+                # No ongoing or recently completed matches
+                bot.reply_to(message, "No IPL live matches at the moment.")
+                return
+        
+        # Send the live scores to the user
+        for match in matches:
+            team_names = match.find("h3").text.strip().replace(",", "")
+            score = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() else 'Not yet Started'
+            score_two = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() else 'Not yet Started'
+            team_one = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[0].text.strip()
+            team_two = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[1].text.strip()
+            message_text = f"<b>{team_names}</b>\n\n"\
+               f"<a href=''>{team_one}</a> - <code>{score}</code>\n"\
+               f"<a href=''>{team_two}</a> - <code>{score_two}</code>"
+            bot.reply_to(message, message_text, parse_mode="HTML")
+    
+    except requests.exceptions.RequestException as e:
+        bot.reply_to(message, "Error fetching data. Please try again later.")
         print(e)
-        # Wait for a few seconds before restarting the bot
-        time.sleep(5)
+bot.delete_webhook()
+
+bot.infinity_polling()
