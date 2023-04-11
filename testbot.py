@@ -5,7 +5,7 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from bs4 import BeautifulSoup
-
+import os
 
 TOKEN = "1638155581:AAGe4dxE4Cz3GXC2NAuHesSAKpeRgwhmQuw"
 
@@ -204,9 +204,9 @@ def handle_text_message(message):
         text = message.text.split(' ', 1)[1]
     else:
         text = "Bnsl Boy"
-    
-    # Generate a new sticker from the text
-    font_path = 'C:\\Users\\adibn\\OneDrive\\Desktop\\telegram\\Vampire Wars Italic.ttf'
+
+    font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+
     sticker_file = generate_sticker(text, font_path)
     # Send the new sticker back to the user
     bot.send_sticker(message.chat.id, sticker_file)
