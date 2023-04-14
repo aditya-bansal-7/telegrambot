@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from bs4 import BeautifulSoup
 import os
+from telebot import types
 
 TOKEN = "1638155581:AAGe4dxE4Cz3GXC2NAuHesSAKpeRgwhmQuw"
 
@@ -16,6 +17,115 @@ LEADERBOARD_FILE = 'leaderboard.json'
 API_KEY = "2748b8f5-8e99-4210-845d-78176b3a1f62"
 
 user_to_count = {}
+
+
+@bot.message_handler(commands=['start'])
+def start_command(message):
+    markup = types.InlineKeyboardMarkup()
+    markup.row(
+    types.InlineKeyboardButton('Crypto 💰', callback_data='crypto_menu'),
+    types.InlineKeyboardButton('Sticker🎁', callback_data='stic')
+)
+
+    bot.send_message(
+        chat_id=message.chat.id,
+        text='Welcome to my bot!',
+        reply_markup=markup
+    )
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_handler(call):
+    if call.data == 'crypto_menu':
+        markup = types.InlineKeyboardMarkup()
+        markup.row(
+            types.InlineKeyboardButton(
+                '/p BTC',
+                callback_data='pbtc'
+            ),
+            types.InlineKeyboardButton(
+                '/cnv 1 BTC USD',
+                callback_data='cbin'
+            )
+        )
+        bot.send_message(
+            chat_id=call.message.chat.id,
+            text='<code>/p</code> - Shows the price and 24h change of a cryptocurrency\n(e.g. /p BTC)\n\n<code>/cnv </code> - Converts a cryptocurrency to a given currency \n(e.g. /cnv 1 BTC USD)',
+            parse_mode= "HTML",
+            reply_markup=markup
+        )
+    elif call.data == 'stic':
+        markup = types.InlineKeyboardMarkup()
+        markup.row(
+            types.InlineKeyboardButton(
+                'Font 1',
+                callback_data='font1'
+            ),
+            types.InlineKeyboardButton(
+                'Font 2',
+                callback_data='font2'
+            ),
+            types.InlineKeyboardButton(
+                'Font 3',
+                callback_data='font3'
+            )
+        )
+        bot.send_message(
+            chat_id=call.message.chat.id,
+            text= '<code>/stic</code> - To Genrate Text To Sticker\n(e.g. /stic Bnsl BOy)\n\nWe have three types of fonts \n font 1 - <code>/stic</code> \n font 2 - <code>/stic1</code> \n font 3 - <code>/stic2</code>',
+            parse_mode= "HTML",
+            reply_markup=markup
+        )
+    elif call.data == 'font1':
+        text = "Bnsl Boy"  # Set the default text for the sticker
+
+        # Generate the sticker based on the text
+        font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+        sticker_file = generate_sticker(text, font_path)
+
+        # Send the sticker back to the user
+        bot.send_sticker(call.message.chat.id, sticker_file)
+    elif call.data == 'font2':
+        text = "Bnsl Boy"  # Set the default text for the sticker
+
+        # Generate the sticker based on the text
+        font_path = os.path.join(os.getcwd(), "Mabook.ttf")
+        sticker_file = generate_sticker(text, font_path)
+
+        # Send the sticker back to the user
+        bot.send_sticker(call.message.chat.id, sticker_file)
+    elif call.data == 'font3':
+        text = "Bnsl Boy"  # Set the default text for the sticker
+
+        # Generate the sticker based on the text
+        font_path = os.path.join(os.getcwd(), "Game Of Squids.ttf")
+        sticker_file = generate_sticker(text, font_path)
+
+        # Send the sticker back to the user
+        bot.send_sticker(call.message.chat.id, sticker_file)
+    elif call.data == 'pbtc':
+        symbol = "BTC"
+        result = get_price(symbol)
+        price, percent_change_24h = result
+        response_text = f"{symbol}: ${price:,.2f}"
+        if percent_change_24h is not None:
+            change_24h_text = f"{percent_change_24h:.2f}%"
+            if percent_change_24h > 0:
+                response_text += f" (🟢{change_24h_text})"
+            elif percent_change_24h < 0:
+                response_text += f" (🔴{change_24h_text})"
+            else:
+                response_text += f" ({change_24h_text})"
+        bot.send_message(call.message.chat.id, response_text)
+    elif call.data == 'cbin':
+        crypto_amount = "1"
+        crypto_symbol = "BTC"
+        currency = "USD"
+        result = convert(crypto_amount, crypto_symbol, currency)
+        response_text = f'<code>{crypto_amount} {crypto_symbol} is worth {result:.8f} {currency}</code>.\n\n'
+        response_text += f'✨ {crypto_amount} <b>{crypto_symbol}</b> = <code>{result:.5f} {currency}</code> \n\n'
+        bot.send_message(call.message.chat.id, response_text, parse_mode="HTML")
+
+
 
 # Load leaderboard data from file on startup
 try:
@@ -163,7 +273,8 @@ def cnv(message):
     bot.reply_to(message, response_text, parse_mode="HTML")
 import io
 from PIL import Image, ImageDraw, ImageFont
-def generate_image(text, font_path, font_size, text_color, border_color, border_size,):
+
+def generate_image(text, font_path, font_size, text_color, border_color, border_size):
     # Create a new image with a transparent background
     size = (512, 512)
     image = Image.new('RGBA', size, (0, 0, 0, 0))
@@ -171,18 +282,37 @@ def generate_image(text, font_path, font_size, text_color, border_color, border_
     # Draw the text onto the image
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype(font_path, size=font_size)
+
+    # Split the text into words
     text = text.replace("kaddu", "luldeep")
     words = text.split()
+
+    # Set the initial y-coordinate
     y = (size[1] - (len(words) * font_size)) / 2
 
-
+    # Draw each word
     for word in words:
-        text_width, text_height = draw.textsize(word, font=font)
+        # Determine the font size for this word
+        word_font_size = font_size
+        if len(word) > 6:
+            extra_letters = len(word) - 6
+            font_decrease_percent = extra_letters * 10
+            word_font_size -= int(font_size * font_decrease_percent / 100)
+
+        # Set the font for this word
+        word_font = ImageFont.truetype(font_path, size=word_font_size)
+
+        # Draw the word onto the image
+        text_width, text_height = draw.textsize(word, font=word_font)
         x = (size[0] - text_width) / 2
-        draw.text((x, y), word, fill=text_color, font=font, stroke_width=border_size, stroke_fill=border_color)
-        y += font_size
+        draw.text((x, y), word, fill=text_color, font=word_font, stroke_width=border_size, stroke_fill=border_color)
+
+        # Update the y-coordinate for the next word
+        y += word_font_size
 
     return image
+
+
 
 def generate_sticker(text, font_path, font_size=100, text_color=(255, 255, 255), border_color=(0, 0, 0), border_size=10):
     # Generate the image
@@ -211,42 +341,68 @@ def handle_text_message(message):
     # Send the new sticker back to the user
     bot.send_sticker(message.chat.id, sticker_file)
 
-@bot.message_handler(commands=['ipl'])
-def send_ipl_scores(message):
-    try:
-        # Fetch live scores of ongoing IPL matches
-        url_data = "https://www.cricbuzz.com/cricket-match/live-scores"
-        r = requests.get(url_data)
-        soup = BeautifulSoup(r.content, 'html.parser')
-        div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
-        matches = div.find_all(class_="cb-mtch-lst cb-col cb-col-100 cb-tms-itm")
-        
-        if len(matches) == 0:
-            # No ongoing matches, fetch scores of recently completed matches
-            recent_data = "https://www.cricbuzz.com/cricket-match/live-scores/recent-matches"
-            r = requests.get(recent_data)
-            soup = BeautifulSoup(r.content, 'html.parser')
-            div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
-            if len(matches) == 0:
-                # No ongoing or recently completed matches
-                bot.reply_to(message, "No IPL live matches at the moment.")
-                return
-        
-        # Send the live scores to the user
-        for match in matches:
-            team_names = match.find("h3").text.strip().replace(",", "")
-            score = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() else 'Not yet Started'
-            score_two = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() else 'Not yet Started'
-            team_one = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[0].text.strip()
-            team_two = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[1].text.strip()
-            message_text = f"<b>{team_names}</b>\n\n"\
-               f"<a href=''>{team_one}</a> - <code>{score}</code>\n"\
-               f"<a href=''>{team_two}</a> - <code>{score_two}</code>"
-            bot.reply_to(message, message_text, parse_mode="HTML")
+@bot.message_handler(commands=['stic1'])
+def handle_text_message(message):  
+    # Check if the message has text
     
-    except requests.exceptions.RequestException as e:
-        bot.reply_to(message, "Error fetching data. Please try again later.")
-        print(e)
-bot.delete_webhook()
+    if len(message.text.split(' ')) > 1:
+        # Get the text from the message command
+        text = message.text.split(' ', 1)[1]
+    else:
+        text = "Bnsl Boy"
+
+    font_path = os.path.join(os.getcwd(), "Mabook.ttf")
+
+    sticker_file = generate_sticker(text, font_path)
+    # Send the new sticker back to the user
+    bot.send_sticker(message.chat.id, sticker_file)
+
+@bot.message_handler(commands=['stic2'])
+def handle_text_message(message):  
+    # Check if the message has text
+    
+    if len(message.text.split(' ')) > 1:
+        # Get the text from the message command
+        text = message.text.split(' ', 1)[1]
+    else:
+        text = "Bnsl Boy"
+
+    font_path = os.path.join(os.getcwd(), "Game Of Squids.ttf")
+
+    sticker_file = generate_sticker(text, font_path)
+    # Send the new sticker back to the user
+    bot.send_sticker(message.chat.id, sticker_file)
+
+trigger_messages = {
+    'sahu': ('luldeep', None),
+    'aditya': ('BNSL BOY', None)
+}
+
+@bot.message_handler(commands=['addstic'])
+def add_trigger_message(message):
+    if len(message.text.split(' ')) > 2:
+        trigger = message.text.split(' ', 2)[1].lower()
+        sticker_text = message.text.split(' ', 2)[2]
+        trigger_messages[trigger] = (sticker_text, message.chat.id)
+        bot.reply_to(message, f"New trigger message added: {trigger} -> {sticker_text}")
+    else:
+        bot.reply_to(message, "<b>Invalid command</b> Usage: <code>/addstic </code><b>trigger message sticker text</b>]" , parse_mode="HTML" )
+
+@bot.message_handler(func=lambda message: any(trigger in message.text.lower() for trigger in trigger_messages.keys()))
+def handle_trigger_message(message):
+    for trigger, (sticker_text, chat_id) in trigger_messages.items():
+        if trigger == 'sahu' or trigger == 'aditya':  # Check for exceptions
+            if trigger in message.text.lower():
+                font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+                sticker_file = generate_sticker(sticker_text, font_path)
+                bot.send_sticker(message.chat.id, sticker_file)
+                break
+        elif chat_id is None or chat_id == message.chat.id:  # Check chat ID
+            if trigger in message.text.lower():
+                font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+                sticker_file = generate_sticker(sticker_text, font_path)
+                bot.send_sticker(message.chat.id, sticker_file)
+                break
+
 
 bot.infinity_polling()
