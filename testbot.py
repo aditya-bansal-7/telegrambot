@@ -672,7 +672,7 @@ def start(message):
     pin4 = random.randint(MIN_PIN, MAX_PIN4)
     global pin4_str
     pin4_str = '{:04d}'.format(pin4)
-    bot.reply_to(message.chat.id, 'Welcome to the Guess the PIN Code game! You have {} attempts to guess the PIN code.'.format(NUM_ATTEMPT4))
+    bot.send_message(message.chat.id, 'Welcome to the Guess the PIN Code game! You have {} attempts to guess the PIN code.'.format(NUM_ATTEMPT4))
 
 @bot.message_handler(commands=['play6x'])
 def start(message):
@@ -682,7 +682,7 @@ def start(message):
     pin6 = random.randint(MIN_PIN, MAX_PIN6)
     global pin6_str
     pin6_str = '{:06d}'.format(pin6)
-    bot.reply_to(message.chat.id, 'Welcome to the Guess the PIN Code game! You have {} attempts to guess the PIN code.'.format(NUM_ATTEMPT6))
+    bot.send_message(message.chat.id, 'Welcome to the Guess the PIN Code game! You have {} attempts to guess the PIN code.'.format(NUM_ATTEMPT6))
 
 @bot.message_handler(commands=['level'])
 def level(message):
@@ -696,7 +696,7 @@ def guess(message):
     user_id = message.from_user.id
     xpq = 10 + get_user_xp(user_id)
     xp_points = update_user_xp(user_id, xpq)
-    bot.reply_to(message, f"You guessed it right! You now have {xp_points} XP points.")
+    bot.send_message(message, f"You guessed it right! You now have {xp_points} XP points.")
 
 @bot.message_handler(commands=['stop4x'])
 def stop(message):
@@ -743,6 +743,8 @@ def guess(message):
             bot.send_message(message.chat.id, "Sorry, an error occurred while updating your XP points. Please try again later.")
             return
         bot.send_message(message.chat.id, 'Congratulations! You guessed the PIN code and won {} XP and {} score.'.format(xp, score))
+        change_pin()
+        
     else:
         # Decrement the number of attempts
         NUM_ATTEMPTS -= 1  # Use the variable after declaring it as global
@@ -761,6 +763,15 @@ def guess(message):
                     hint += '_'
             bot.send_message(message.chat.id, 'Hint: {}'.format(hint))
             return
+
+def change_pin():
+    global pin4, pin4_str, pin6 ,pin6_str
+    pin4 = random.randint(MIN_PIN, MAX_PIN4)
+    pin4_str = '{:04d}'.format(pin4)
+
+
+    pin6 = random.randint(MIN_PIN, MAX_PIN6)
+    pin6_str = '{:04d}'.format(pin6)
 
 # function to update user's XP points
 def update_user_xp(user_id, xp_points):
