@@ -12,10 +12,10 @@ from bs4 import BeautifulSoup
 import random
 import time
 
+
 Token = os.environ.get("token")
 
 bot = telebot.TeleBot(Token)
-
 
 LEADERBOARD_FILE = 'leaderboard.json'
 
@@ -1258,11 +1258,10 @@ def Fgas_prices(gas_prices):
     else:
         print("Unable to fetch gas prices.")
 
-send_alert = True
-l_time = 0
-
 def gasTimeFunction():
     with threading.Lock():
+        l_time = 0
+        send_alert = True
         while True:
             if l_time + 3600 < time.time():
                 l_time = time.time()
