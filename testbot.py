@@ -721,7 +721,7 @@ def ipl(message):
     except requests.exceptions.RequestException as e:
             bot.reply_to(message, "Error fetching data. Please try again later.")
             print(e)
-bot.delete_webhook()
+
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
