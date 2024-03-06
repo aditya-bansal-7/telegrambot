@@ -13,7 +13,8 @@ import random
 import time
 
 
-Token = os.environ.get("token")
+# Token = os.environ.get("token")
+Token = "5967390922:AAFjXJ0mNuSCElnoHahhtzjgk3vfIQZUE34"
 
 bot = telebot.TeleBot(Token)
 
@@ -98,6 +99,7 @@ def start_han(message):
 
 
 def call_hand(call):
+    global alrt
     if call.data == 'crypto_menu':
         markup = types.InlineKeyboardMarkup()
         markup.row(
@@ -402,8 +404,15 @@ def call_hand(call):
         markup.add(types.InlineKeyboardButton(text='Refresh', callback_data=f'ref:{symbol}:{message_id}:{chat_id}'))
         if call.message.text != response_text:
             bot.edit_message_text(response_text,chat_id,message_id,reply_markup=markup,parse_mode='Markdown')
-
-
+    elif call.data.startswith(("alt:")):
+        g = call.data.split(":")[1]
+        if g == 'y':
+            alrt = False
+            bot.answer_callback_query(call.id,"Bot will send alert")
+        elif g == 'n':
+            alrt = True
+            bot.answer_callback_query(call.id,"Bot will not send alert")
+    
 def get_price(crypto_symbol):
     url = f'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol={crypto_symbol}&convert=USD'
     headers = {'X-CMC_PRO_API_KEY': API_KEY}
@@ -1244,7 +1253,6 @@ def unblacklist_user(message):
 def get_eth_gas_prices():
     url = f"https://api.etherscan.io/api?module=gastracker&action=gasoracle"
     response = requests.get(url)
-
     if response.status_code == 200:
         data = response.json()
         return data['result']
@@ -1258,7 +1266,10 @@ def Fgas_prices(gas_prices):
     else:
         print("Unable to fetch gas prices.")
 
+alrt = True
+
 def gasTimeFunction():
+    global alrt
     with threading.Lock():
         l_time = 0
         send_alert = True
@@ -1267,14 +1278,23 @@ def gasTimeFunction():
                 l_time = time.time()
                 gas_prices = get_eth_gas_prices()
                 Fgas_prices(gas_prices)
-                send_alert = True
+                if alrt:
+                    send_alert = True
             
             gas_prices = get_eth_gas_prices()
             if gas_prices :
                 chat_id = -1001679321636
                 if int(gas_prices['ProposeGasPrice']) < 50 :
                     if send_alert:
-                        m = bot.send_message(chat_id,f"Alert Alert Alert \n\nCurrent gas price -- {gas_prices['ProposeGasPrice']}")
+                        markup = types.InlineKeyboardMarkup()
+                        markup.row(
+                            types.InlineKeyboardButton(
+                                'Send Alert Message Y/N',
+                                callback_data='alt:y'
+                            ))
+                        
+                        m = bot.send_message(chat_id,f"Alert Alert Alert \n\nCurrent gas price -- {gas_prices['ProposeGasPrice']}",reply_markup=markup)
+                        
                         bot.pin_chat_message(chat_id,m.id)
                         send_alert = False
             time.sleep(60)
