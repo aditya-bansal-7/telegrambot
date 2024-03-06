@@ -12,8 +12,10 @@ from bs4 import BeautifulSoup
 import random
 import time
 
+Token = os.environ.get("token")
 
-bot = os.environ.get("token")
+bot = telebot.TeleBot(Token)
+
 
 LEADERBOARD_FILE = 'leaderboard.json'
 
