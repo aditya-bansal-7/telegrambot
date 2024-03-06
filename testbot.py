@@ -7,7 +7,6 @@ import uuid
 import telebot.util
 import json
 import requests
-from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from bs4 import BeautifulSoup
 import random
@@ -119,81 +118,81 @@ def call_hand(call):
             parse_mode= "HTML",
             reply_markup=markup
         )
-    elif call.data == 'stic':
-        markup = types.InlineKeyboardMarkup()
-        markup.row(
-            types.InlineKeyboardButton(
-                'Font 1',
-                callback_data='font1'
-            ),
-            types.InlineKeyboardButton(
-                'Font 2',
-                callback_data='font2'
-            ),
-            types.InlineKeyboardButton(
-                'Font 3',
-                callback_data='font3'
-            )
-        )
-        markup.add(types.InlineKeyboardButton('Return to Main Menu', callback_data='main_menu', 
-            # set the button width to be 2/3 of the available space and height to be 2x the default size
-            callback_game={'width': 2, 'height': 2}))
+    # elif call.data == 'stic':
+    #     markup = types.InlineKeyboardMarkup()
+    #     markup.row(
+    #         types.InlineKeyboardButton(
+    #             'Font 1',
+    #             callback_data='font1'
+    #         ),
+    #         types.InlineKeyboardButton(
+    #             'Font 2',
+    #             callback_data='font2'
+    #         ),
+    #         types.InlineKeyboardButton(
+    #             'Font 3',
+    #             callback_data='font3'
+    #         )
+    #     )
+    #     markup.add(types.InlineKeyboardButton('Return to Main Menu', callback_data='main_menu', 
+    #         # set the button width to be 2/3 of the available space and height to be 2x the default size
+    #         callback_game={'width': 2, 'height': 2}))
 
             
-        bot.send_message(
-                    chat_id=call.message.chat.id,
-                    text= '<code>/stic</code> - To Genrate Text To Sticker\n(e.g. /stic Bnsl BOy)\n\nWe have three types of fonts \n font 1 - <code>/stic</code> \n font 2 - <code>/stic1</code> \n font 3 - <code>/stic2</code>',
-                    parse_mode= "HTML",
-                    reply_markup=markup
-                )
-    elif call.data == 'font1':
-        text = "Bnsl Boy"  # Set the default text for the sticker
+    #     bot.send_message(
+    #                 chat_id=call.message.chat.id,
+    #                 text= '<code>/stic</code> - To Genrate Text To Sticker\n(e.g. /stic Bnsl BOy)\n\nWe have three types of fonts \n font 1 - <code>/stic</code> \n font 2 - <code>/stic1</code> \n font 3 - <code>/stic2</code>',
+    #                 parse_mode= "HTML",
+    #                 reply_markup=markup
+    #             )
+    # elif call.data == 'font1':
+    #     text = "Bnsl Boy"  # Set the default text for the sticker
 
-        # Generate the sticker based on the text
-        font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
-        sticker_file = generate_sticker(text, font_path)
+    #     # Generate the sticker based on the text
+    #     font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+    #     sticker_file = generate_sticker(text, font_path)
 
-        # Send the sticker back to the user
-        bot.send_sticker(call.message.chat.id, sticker_file)
-    elif call.data == 'font2':
-        text = "Bnsl Boy"  # Set the default text for the sticker
+    #     # Send the sticker back to the user
+    #     bot.send_sticker(call.message.chat.id, sticker_file)
+    # elif call.data == 'font2':
+    #     text = "Bnsl Boy"  # Set the default text for the sticker
 
-        # Generate the sticker based on the text
-        font_path = os.path.join(os.getcwd(), "Mabook.ttf")
-        sticker_file = generate_sticker(text, font_path)
+    #     # Generate the sticker based on the text
+    #     font_path = os.path.join(os.getcwd(), "Mabook.ttf")
+    #     sticker_file = generate_sticker(text, font_path)
 
-        # Send the sticker back to the user
-        bot.send_sticker(call.message.chat.id, sticker_file)
-    elif call.data == 'font3':
-        text = "Bnsl Boy"  # Set the default text for the sticker
+    #     # Send the sticker back to the user
+    #     bot.send_sticker(call.message.chat.id, sticker_file)
+    # elif call.data == 'font3':
+    #     text = "Bnsl Boy"  # Set the default text for the sticker
 
-        # Generate the sticker based on the text
-        font_path = os.path.join(os.getcwd(), "Game Of Squids.ttf")
-        sticker_file = generate_sticker(text, font_path)
+    #     # Generate the sticker based on the text
+    #     font_path = os.path.join(os.getcwd(), "Game Of Squids.ttf")
+    #     sticker_file = generate_sticker(text, font_path)
 
-        # Send the sticker back to the user
-        bot.send_sticker(call.message.chat.id, sticker_file)
-    elif call.data == 'count':
-        bot.send_message(
-            chat_id=call.message.chat.id,
-            text='<code>/count</code> - To check numbers of members you add \n <code>/leaderboard</code> - To see top 10 users \n <code>/reset</code> - To reset leaderboard',
-            parse_mode='HTML'
-        )
-    elif call.data == 'pbtc':
-        symbol = "BTC"
-        result = get_price(symbol)
-        price, percent_change_24h = result
-        response_text = f"{symbol}: ${price:,.2f}"
-        if percent_change_24h is not None:
-            change_24h_text = f"{percent_change_24h:.2f}%"
-            if percent_change_24h > 0:
-                response_text += f" (🟢{change_24h_text})"
-            elif percent_change_24h < 0:
-                response_text += f" (🔴{change_24h_text})"
-            else:
-                response_text += f" ({change_24h_text})"
+    #     # Send the sticker back to the user
+    #     bot.send_sticker(call.message.chat.id, sticker_file)
+    # elif call.data == 'count':
+    #     bot.send_message(
+    #         chat_id=call.message.chat.id,
+    #         text='<code>/count</code> - To check numbers of members you add \n <code>/leaderboard</code> - To see top 10 users \n <code>/reset</code> - To reset leaderboard',
+    #         parse_mode='HTML'
+    #     )
+    # elif call.data == 'pbtc':
+    #     symbol = "BTC"
+    #     result = get_price(symbol)
+    #     price, percent_change_24h = result
+    #     response_text = f"{symbol}: ${price:,.2f}"
+    #     if percent_change_24h is not None:
+    #         change_24h_text = f"{percent_change_24h:.2f}%"
+    #         if percent_change_24h > 0:
+    #             response_text += f" (🟢{change_24h_text})"
+    #         elif percent_change_24h < 0:
+    #             response_text += f" (🔴{change_24h_text})"
+    #         else:
+    #             response_text += f" ({change_24h_text})"
 
-        bot.answer_callback_query(call.id, response_text)
+    #     bot.answer_callback_query(call.id, response_text)
 
 
     elif call.data == 'cbin':
@@ -478,73 +477,73 @@ def cnv_f(message):
     #response_text += f'✨ Last 24 hours change: {percent_change_24h:.2f}%'
     bot.reply_to(message, response_text, parse_mode="HTML")
 
-def generate_image(text, font_path, font_size, text_color, border_color, border_size, padding=10):
-    # Create a new image with a transparent background
-    # Calculate the required image size based on the text dimensions and padding
-    font = ImageFont.truetype(font_path, size=font_size)
-    words = text.split()
-    max_word_width = max(font.getsize(word)[0] for word in words)
-    text_height = sum(font.getsize(word)[1] for word in words)
-    size = (max_word_width + 2 * padding, text_height + (len(words) - 1) * padding)
+# def generate_image(text, font_path, font_size, text_color, border_color, border_size, padding=10):
+#     # Create a new image with a transparent background
+#     # Calculate the required image size based on the text dimensions and padding
+#     font = ImageFont.truetype(font_path, size=font_size)
+#     words = text.split()
+#     max_word_width = max(font.getsize(word)[0] for word in words)
+#     text_height = sum(font.getsize(word)[1] for word in words)
+#     size = (max_word_width + 2 * padding, text_height + (len(words) - 1) * padding)
 
-    image = Image.new('RGBA', size, (0, 0, 0, 0))
+#     image = Image.new('RGBA', size, (0, 0, 0, 0))
 
-    # Draw the text onto the image
-    draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(font_path, size=font_size)
+#     # Draw the text onto the image
+#     draw = ImageDraw.Draw(image)
+#     font = ImageFont.truetype(font_path, size=font_size)
 
-    # Split the text into words
-    text = text.replace("kaddu", "luldeep")
-    words = text.split()
+#     # Split the text into words
+#     text = text.replace("kaddu", "luldeep")
+#     words = text.split()
 
-    # Set the initial y-coordinate
-    y = padding // 2
+#     # Set the initial y-coordinate
+#     y = padding // 2
 
-    # Draw each word
-    for word in words:
-        # Determine the font size for this word
-        word_font_size = font_size
-        if len(word) > 6:
-            extra_letters = len(word) - 6
-            font_decrease_percent = extra_letters * 10
-            word_font_size -= int(font_size * font_decrease_percent / 100)
+#     # Draw each word
+#     for word in words:
+#         # Determine the font size for this word
+#         word_font_size = font_size
+#         if len(word) > 6:
+#             extra_letters = len(word) - 6
+#             font_decrease_percent = extra_letters * 10
+#             word_font_size -= int(font_size * font_decrease_percent / 100)
 
-        # Set the font for this word
-        word_font = ImageFont.truetype(font_path, size=word_font_size)
+#         # Set the font for this word
+#         word_font = ImageFont.truetype(font_path, size=word_font_size)
 
-        # Draw the word onto the image
-        text_width, text_height = draw.textsize(word, font=word_font)
-        x = (size[0] - text_width) / 2
-        draw.text((x, y), word, fill=text_color, font=word_font, stroke_width=border_size, stroke_fill=border_color)
+#         # Draw the word onto the image
+#         text_width, text_height = draw.textsize(word, font=word_font)
+#         x = (size[0] - text_width) / 2
+#         draw.text((x, y), word, fill=text_color, font=word_font, stroke_width=border_size, stroke_fill=border_color)
 
-        # Update the y-coordinate for the next word
-        y += word_font_size
+#         # Update the y-coordinate for the next word
+#         y += word_font_size
     
     
-    return image
+#     return image
 
 
-def generate_sticker(text, font_path, font_size=100, text_color=(255, 255, 255), border_color=(0, 0, 0), border_size=10):
-    # Generate the image
-    image = generate_image(text, font_path, font_size, text_color, border_color, border_size)
+# def generate_sticker(text, font_path, font_size=100, text_color=(255, 255, 255), border_color=(0, 0, 0), border_size=10):
+#     # Generate the image
+#     image = generate_image(text, font_path, font_size, text_color, border_color, border_size)
 
-    # Convert the image to a sticker file
-    sticker_file = BytesIO()
-    image.save(sticker_file, format='PNG')
-    sticker_file.seek(0)
+#     # Convert the image to a sticker file
+#     sticker_file = BytesIO()
+#     image.save(sticker_file, format='PNG')
+#     sticker_file.seek(0)
 
-    return sticker_file
+#     return sticker_file
 
-def generate_web_text(text):
-    web = requests.get(f'https://textgiraffe.com/Name-Generator?text={text}')
-    soup = BeautifulSoup(web.content, 'html.parser')
-    for img in soup.findAll('img'):
-        if img.get('src') != None:    
-            img_url = img.get('src')
-            name = img_url.split('designstyle-')[-1]
-            if name == 'bluffing-l.png':
-                img_r = requests.get(img_url).content
-    return img_r
+# def generate_web_text(text):
+#     web = requests.get(f'https://textgiraffe.com/Name-Generator?text={text}')
+#     soup = BeautifulSoup(web.content, 'html.parser')
+#     for img in soup.findAll('img'):
+#         if img.get('src') != None:    
+#             img_url = img.get('src')
+#             name = img_url.split('designstyle-')[-1]
+#             if name == 'bluffing-l.png':
+#                 img_r = requests.get(img_url).content
+#     return img_r
 
 def time_check():
     with threading.Lock():
@@ -651,41 +650,41 @@ def change_pin():
     pin6 = random.randint(MIN_PIN, MAX_PIN6)
     pin6_str = '{:04d}'.format(pin6)
 
-def rmbg(message):
-    # Check if the message has a photo in reply
-    if message.reply_to_message and message.reply_to_message.photo:
-        # Get the photo file ID
-        file_id = message.reply_to_message.photo[-1].file_id
-        # Download the photo
-        file_info = bot.get_file(file_id)
-        file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
-        # Save the photo locally
-        with open('image.jpg', 'wb') as f:
-            f.write(file.content)
-        # Send a "working" message
-        bot.send_message(message.chat.id, "Removing background...")
-        # Send a request to remove.bg API
-        response = requests.post(
-            'https://api.remove.bg/v1.0/removebg',
-            files={'image_file': open('image.jpg', 'rb')},
-            data={'size': 'auto'},
-            headers={'X-Api-Key': REMOVEBG_API_KEY},
-        )
-        # Check for errors
-        if response.status_code == requests.codes.ok:
-            # Save the output image locally
-            with open('output.png', 'wb') as f:
-                f.write(response.content)
-            # Send the output image
-            with open('output.png', 'rb') as f:
-                bot.send_photo(message.chat.id, f)
-        else:
-            bot.send_message(message.chat.id, "Failed to remove background.")
-        # Delete the temporary files
-        os.remove('image.jpg')
-        os.remove('output.png')
-    else:
-        bot.reply_to(message, "Please reply to a photo with /rmbg to remove its background.")
+# def rmbg(message):
+#     # Check if the message has a photo in reply
+#     if message.reply_to_message and message.reply_to_message.photo:
+#         # Get the photo file ID
+#         file_id = message.reply_to_message.photo[-1].file_id
+#         # Download the photo
+#         file_info = bot.get_file(file_id)
+#         # file = requests.get('https://api.telegram.org/file/bot{0}/{1}'.format(TOKEN, file_info.file_path))
+#         # Save the photo locally
+#         with open('image.jpg', 'wb') as f:
+#             f.write(file.content)
+#         # Send a "working" message
+#         bot.send_message(message.chat.id, "Removing background...")
+#         # Send a request to remove.bg API
+#         response = requests.post(
+#             'https://api.remove.bg/v1.0/removebg',
+#             files={'image_file': open('image.jpg', 'rb')},
+#             data={'size': 'auto'},
+#             headers={'X-Api-Key': REMOVEBG_API_KEY},
+#         )
+#         # Check for errors
+#         if response.status_code == requests.codes.ok:
+#             # Save the output image locally
+#             with open('output.png', 'wb') as f:
+#                 f.write(response.content)
+#             # Send the output image
+#             with open('output.png', 'rb') as f:
+#                 bot.send_photo(message.chat.id, f)
+#         else:
+#             bot.send_message(message.chat.id, "Failed to remove background.")
+#         # Delete the temporary files
+#         os.remove('image.jpg')
+#         os.remove('output.png')
+#     else:
+#         bot.reply_to(message, "Please reply to a photo with /rmbg to remove its background.")
 
 def ipl(message):
     try:
@@ -817,101 +816,101 @@ def cnv(message):
 
 
 
-@bot.message_handler(commands=['stic'])
-def handle_text_message(message):  
-    # Check if the message has text
+# @bot.message_handler(commands=['stic'])
+# def handle_text_message(message):  
+#     # Check if the message has text
     
-    if len(message.text.split(' ')) > 1:
-        # Get the text from the message command
-        text = message.text.split(' ', 1)[1]
-    else:
-        text = "Bnsl Boy"
+#     if len(message.text.split(' ')) > 1:
+#         # Get the text from the message command
+#         text = message.text.split(' ', 1)[1]
+#     else:
+#         text = "Bnsl Boy"
 
-    font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+#     font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
 
-    sticker_file = generate_sticker(text, font_path)
-    # Send the new sticker back to the user
-    bot.send_sticker(message.chat.id, sticker_file)
+#     sticker_file = generate_sticker(text, font_path)
+#     # Send the new sticker back to the user
+#     bot.send_sticker(message.chat.id, sticker_file)
 
-@bot.message_handler(commands=['stic1'])
-def handle_text_message(message):  
-    # Check if the message has text
+# @bot.message_handler(commands=['stic1'])
+# def handle_text_message(message):  
+#     # Check if the message has text
     
-    if len(message.text.split(' ')) > 1:
-        # Get the text from the message command
-        text = message.text.split(' ', 1)[1]
-    else:
-        text = "Bnsl Boy"
+#     if len(message.text.split(' ')) > 1:
+#         # Get the text from the message command
+#         text = message.text.split(' ', 1)[1]
+#     else:
+#         text = "Bnsl Boy"
 
-    font_path = os.path.join(os.getcwd(), "Mabook.ttf")
+#     font_path = os.path.join(os.getcwd(), "Mabook.ttf")
 
-    sticker_file = generate_sticker(text, font_path)
-    # Send the new sticker back to the user
-    bot.send_sticker(message.chat.id, sticker_file)
-
-
-@bot.message_handler(commands=['stic3'])
-def handle_text_message(message):
-    if len(message.text.split(' ')) > 1:
-        # Get the text from the message command
-        text = message.text.split(' ', 1)[1]
-
-        for i in range(0, len(text), 1):
-            if (text[i] == ' '):
-                text = text.replace(text[i], '+')
-    else:
-        text = "Bnsl+Boy"
-
-    img_r = generate_web_text(text)
-    bot.send_sticker(message.chat.id, img_r)
+#     sticker_file = generate_sticker(text, font_path)
+#     # Send the new sticker back to the user
+#     bot.send_sticker(message.chat.id, sticker_file)
 
 
-@bot.message_handler(commands=['stic2'])
-def handle_text_message(message):  
-    # Check if the message has text
+# @bot.message_handler(commands=['stic3'])
+# def handle_text_message(message):
+#     if len(message.text.split(' ')) > 1:
+#         # Get the text from the message command
+#         text = message.text.split(' ', 1)[1]
+
+#         for i in range(0, len(text), 1):
+#             if (text[i] == ' '):
+#                 text = text.replace(text[i], '+')
+#     else:
+#         text = "Bnsl+Boy"
+
+#     img_r = generate_web_text(text)
+#     bot.send_sticker(message.chat.id, img_r)
+
+
+# @bot.message_handler(commands=['stic2'])
+# def handle_text_message(message):  
+#     # Check if the message has text
     
-    if len(message.text.split(' ')) > 1:
-        # Get the text from the message command
-        text = message.text.split(' ', 1)[1]
-    else:
-        text = "Bnsl Boy"
+#     if len(message.text.split(' ')) > 1:
+#         # Get the text from the message command
+#         text = message.text.split(' ', 1)[1]
+#     else:
+#         text = "Bnsl Boy"
 
-    font_path = os.path.join(os.getcwd(), "Game Of Squids.ttf")
+#     font_path = os.path.join(os.getcwd(), "Game Of Squids.ttf")
 
-    sticker_file = generate_sticker(text, font_path)
-    # Send the new sticker back to the user
-    bot.send_sticker(message.chat.id, sticker_file)
+#     sticker_file = generate_sticker(text, font_path)
+#     # Send the new sticker back to the user
+#     bot.send_sticker(message.chat.id, sticker_file)
 
 
-trigger_messages = {
-    'sahu': ('luldeep', None)
-}
+# trigger_messages = {
+#     'sahu': ('luldeep', None)
+# }
 
-@bot.message_handler(commands=['addstic'])
-def add_trigger_message(message):
-    if len(message.text.split(' ')) > 2:
-        trigger = message.text.split(' ', 2)[1].lower()
-        sticker_text = message.text.split(' ', 2)[2]
-        trigger_messages[trigger] = (sticker_text, message.chat.id)
-        bot.reply_to(message, f"New trigger message added: {trigger} -> {sticker_text}")
-    else:
-        bot.reply_to(message, "<b>Invalid command</b> Usage: <code>/addstic </code><b>trigger message sticker text</b>]" , parse_mode="HTML" )
+# @bot.message_handler(commands=['addstic'])
+# def add_trigger_message(message):
+#     if len(message.text.split(' ')) > 2:
+#         trigger = message.text.split(' ', 2)[1].lower()
+#         sticker_text = message.text.split(' ', 2)[2]
+#         trigger_messages[trigger] = (sticker_text, message.chat.id)
+#         bot.reply_to(message, f"New trigger message added: {trigger} -> {sticker_text}")
+#     else:
+#         bot.reply_to(message, "<b>Invalid command</b> Usage: <code>/addstic </code><b>trigger message sticker text</b>]" , parse_mode="HTML" )
 
-@bot.message_handler(func=lambda message: any(trigger in message.text.lower() for trigger in trigger_messages.keys()))
-def handle_trigger_message(message):
-    for trigger, (sticker_text, chat_id) in trigger_messages.items():
-        if trigger == 'sahu' or trigger == 'aditya':  # Check for exceptions
-            if trigger in message.text.lower():
-                font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
-                sticker_file = generate_sticker(sticker_text, font_path)
-                bot.send_sticker(message.chat.id, sticker_file)
-                break
-        elif chat_id is None or chat_id == message.chat.id:  # Check chat ID
-            if trigger in message.text.lower():
-                font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
-                sticker_file = generate_sticker(sticker_text, font_path)
-                bot.send_sticker(message.chat.id, sticker_file)
-                break
+# @bot.message_handler(func=lambda message: any(trigger in message.text.lower() for trigger in trigger_messages.keys()))
+# def handle_trigger_message(message):
+#     for trigger, (sticker_text, chat_id) in trigger_messages.items():
+#         if trigger == 'sahu' or trigger == 'aditya':  # Check for exceptions
+#             if trigger in message.text.lower():
+#                 font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+#                 sticker_file = generate_sticker(sticker_text, font_path)
+#                 bot.send_sticker(message.chat.id, sticker_file)
+#                 break
+#         elif chat_id is None or chat_id == message.chat.id:  # Check chat ID
+#             if trigger in message.text.lower():
+#                 font_path = os.path.join(os.getcwd(), "Vampire Wars Italic.ttf")
+#                 sticker_file = generate_sticker(sticker_text, font_path)
+#                 bot.send_sticker(message.chat.id, sticker_file)
+#                 break
 
 
 
@@ -989,9 +988,9 @@ def send_ipl_scores(message):
     
 
 
-@bot.message_handler(commands=['rmbg'])
-def remove_background(message):
-    rmbg(message)
+# @bot.message_handler(commands=['rmbg'])
+# def remove_background(message):
+#     rmbg(message)
     
 
 # Define a command handler
