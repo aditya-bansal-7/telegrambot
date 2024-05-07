@@ -1314,7 +1314,7 @@ def ipl_check():
         while True:
             m = ipl()
             if m != ipl_list['message']:
-                for chat_id , ms_id in ipl_list:
+                for chat_id , ms_id in ipl_list.items():
                     if chat_id == 'message':
                         continue
                     chat_id = int(chat_id)
