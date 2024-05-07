@@ -1318,6 +1318,7 @@ def ipl_check():
                     if chat_id == 'message':
                         continue
                     chat_id = int(chat_id)
+                    ipl_list['message'] = m
                     bot.edit_message_text(m,chat_id,ms_id,parse_mode = 'HTML')
 
             time.sleep(10)
