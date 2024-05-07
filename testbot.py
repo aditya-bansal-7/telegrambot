@@ -697,42 +697,37 @@ def change_pin():
 #     else:
 #         bot.reply_to(message, "Please reply to a photo with /rmbg to remove its background.")
 
-def ipl(message):
+
+def ipl():
     try:
-            # Fetch live scores of ongoing IPL matches
-            url_data = "https://www.cricbuzz.com/cricket-match/live-scores"
-            r = requests.get(url_data)
+        url_data = "https://www.cricbuzz.com/cricket-match/live-scores"
+        r = requests.get(url_data)
+        soup = BeautifulSoup(r.content, 'html.parser')
+        div = soup.find("div", attrs={"ng-init": "active_match_type= 'international-tab'"})
+
+        matches = div.find_all(class_="cb-col cb-col-100 cb-plyr-tbody cb-rank-hdr cb-lv-main")
+        
+        if len(matches) == 0:
+
+            recent_data = "https://www.cricbuzz.com/cricket-match/live-scores/recent-matches"
+            r = requests.get(recent_data)
             soup = BeautifulSoup(r.content, 'html.parser')
             div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
-            matches = div.find_all(class_="cb-mtch-lst cb-col cb-col-100 cb-tms-itm")
-            
             if len(matches) == 0:
-                # No ongoing matches, fetch scores of recently completed matches
-                recent_data = "https://www.cricbuzz.com/cricket-match/live-scores/recent-matches"
-                r = requests.get(recent_data)
-                soup = BeautifulSoup(r.content, 'html.parser')
-                div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
-                if len(matches) == 0:
-                    # No ongoing or recently completed matches
-                    bot.reply_to(message, "No IPL live matches at the moment.")
-                    return
-            
-            # Send the live scores to the user
-            for match in matches:
-                team_names = match.find("h3").text.strip().replace(",", "")
-                score = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() else 'Not yet Started'
-                score_two = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() else 'Not yet Started'
-                team_one = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[0].text.strip()
-                team_two = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[1].text.strip()
-                message_text = f"<b>{team_names}</b>\n\n"\
-                f"<a href=''>{team_one}</a> - <code>{score}</code>\n"\
-                f"<a href=''>{team_two}</a> - <code>{score_two}</code>"
-                bot.reply_to(message, message_text, parse_mode="HTML")
-        
+                return "No IPL live matches at the moment."
+        for match in matches:
+            team_names = match.find("h3").text.strip().replace(",", "")
+            score = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() else 'Not yet Started'
+            score_two = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() else 'Not yet Started'
+            team_one = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[0].text.strip()
+            team_two = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[1].text.strip()
+            message_text = f"<b>{team_names}</b>\n\n"\
+            f"<a href=''>{team_one}</a> - <code>{score}</code>\n"\
+            f"<a href=''>{team_two}</a> - <code>{score_two}</code>"
+            return message_text
     except requests.exceptions.RequestException as e:
-            bot.reply_to(message, "Error fetching data. Please try again later.")
             print(e)
-
+            return "Error fetching data. Please try again later. "
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
@@ -995,9 +990,8 @@ def giveaway_handler(message):
 
 @bot.message_handler(commands=['ipl'])
 def send_ipl_scores(message):
-    ipl(message)
+    bot.reply_to(message, ipl())
     
-
 
 # @bot.message_handler(commands=['rmbg'])
 # def remove_background(message):
