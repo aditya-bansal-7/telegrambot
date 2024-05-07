@@ -1262,38 +1262,38 @@ def Fgas_prices(gas_prices):
 
 alrt = True
 
-def gasTimeFunction():
-    global alrt
-    with threading.Lock():
-        l_time = 0
-        send_alert = True
-        while True:
-            if l_time + 3600 < time.time():
-                l_time = time.time()
-                gas_prices = get_eth_gas_prices()
-                Fgas_prices(gas_prices)
-                if alrt:
-                    send_alert = True
+# def gasTimeFunction():
+#     global alrt
+#     with threading.Lock():
+#         l_time = 0
+#         send_alert = True
+#         while True:
+#             if l_time + 3600 < time.time():
+#                 l_time = time.time()
+#                 gas_prices = get_eth_gas_prices()
+#                 Fgas_prices(gas_prices)
+#                 if alrt:
+#                     send_alert = True
             
-            gas_prices = get_eth_gas_prices()
-            if gas_prices :
-                chat_id = -1001679321636
-                if int(gas_prices['ProposeGasPrice']) < 50 :
-                    if send_alert:
-                        markup = types.InlineKeyboardMarkup()
-                        markup.row(
-                            types.InlineKeyboardButton(
-                                'Send Alert Message Y/N',
-                                callback_data='alt:y'
-                            ))
+#             gas_prices = get_eth_gas_prices()
+#             if gas_prices :
+#                 chat_id = -1001679321636
+#                 if int(gas_prices['ProposeGasPrice']) < 50 :
+#                     if send_alert:
+#                         markup = types.InlineKeyboardMarkup()
+#                         markup.row(
+#                             types.InlineKeyboardButton(
+#                                 'Send Alert Message Y/N',
+#                                 callback_data='alt:y'
+#                             ))
                         
-                        m = bot.send_message(chat_id,f"Alert Alert Alert \n\nCurrent gas price -- {gas_prices['ProposeGasPrice']}",reply_markup=markup)
+#                         m = bot.send_message(chat_id,f"Alert Alert Alert \n\nCurrent gas price -- {gas_prices['ProposeGasPrice']}",reply_markup=markup)
                         
-                        bot.pin_chat_message(chat_id,m.id)
-                        send_alert = False
-            time.sleep(60)
+#                         bot.pin_chat_message(chat_id,m.id)
+#                         send_alert = False
+#             time.sleep(60)
 
-time_thread = threading.Thread(target=gasTimeFunction)
-time_thread.start()
+# time_thread = threading.Thread(target=gasTimeFunction)
+# time_thread.start()
 
 bot.infinity_polling()
