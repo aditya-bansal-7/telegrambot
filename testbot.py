@@ -701,34 +701,38 @@ def change_pin():
 
 def ipl():
     try:
-        url_data = "https://www.cricbuzz.com/cricket-match/live-scores"
-        r = requests.get(url_data)
-        soup = BeautifulSoup(r.content, 'html.parser')
-        div = soup.find("div", attrs={"ng-init": "active_match_type= 'international-tab'"})
-
-        matches = div.find_all(class_="cb-col cb-col-100 cb-plyr-tbody cb-rank-hdr cb-lv-main")
-        
-        if len(matches) == 0:
-
-            recent_data = "https://www.cricbuzz.com/cricket-match/live-scores/recent-matches"
-            r = requests.get(recent_data)
+            # Fetch live scores of ongoing IPL matches
+            url_data = "https://www.cricbuzz.com/cricket-match/live-scores"
+            r = requests.get(url_data)
             soup = BeautifulSoup(r.content, 'html.parser')
             div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
+            matches = div.find_all(class_="cb-mtch-lst cb-col cb-col-100 cb-tms-itm")
+            
             if len(matches) == 0:
-                return "No IPL live matches at the moment."
-        for match in matches:
-            team_names = match.find("h3").text.strip().replace(",", "")
-            score = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() else 'Not yet Started'
-            score_two = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() else 'Not yet Started'
-            team_one = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[0].text.strip()
-            team_two = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[1].text.strip()
-            message_text = f"<b>{team_names}</b>\n\n"\
-            f"<a href=''>{team_one}</a> - <code>{score}</code>\n"\
-            f"<a href=''>{team_two}</a> - <code>{score_two}</code>"
-            return message_text
+                # No ongoing matches, fetch scores of recently completed matches
+                recent_data = "https://www.cricbuzz.com/cricket-match/live-scores/recent-matches"
+                r = requests.get(recent_data)
+                soup = BeautifulSoup(r.content, 'html.parser')
+                div = soup.find("div", attrs={"ng-show": "active_match_type == 'league-tab'"})
+                if len(matches) == 0:
+                    # No ongoing or recently completed matches
+                    return "No IPL live matches at the moment."
+            
+            # Send the live scores to the user
+            for match in matches:
+                team_names = match.find("h3").text.strip().replace(",", "")
+                score = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[0].text.strip() else 'Not yet Started'
+                score_two = match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() if match.find_all("div", attrs={"style": "display:inline-block; width:140px"})[1].text.strip() else 'Not yet Started'
+                team_one = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[0].text.strip()
+                team_two = match.find_all("div", attrs={"class": "cb-ovr-flo cb-hmscg-tm-nm"})[1].text.strip()
+                message_text = f"<b>{team_names}</b>\n\n"\
+                f"<a href=''>{team_one}</a> - <code>{score}</code>\n"\
+                f"<a href=''>{team_two}</a> - <code>{score_two}</code>"
+                return message_text
+        
     except requests.exceptions.RequestException as e:
             print(e)
-            return "Error fetching data. Please try again later. "
+            return "Error fetching data. Please try again later."
 
 @bot.message_handler(commands=['start'])
 def start_command(message):
@@ -994,12 +998,12 @@ def giveaway_handler(message):
 def send_ipl_scores(message):
 
     if str(message.chat.id) in ipl_list.keys():
-        ms = bot.reply_to(message, ipl())
+        ms = bot.reply_to(message, ipl() ,parse_mode = 'HTML')
         bot.pin_chat_message(message.chat.id,ms.id)
         bot.delete_message(message.chat.id ,ipl_list[str(message.chat.id)])
         ipl_list[str(message.chat.id)] = ms.id
     else:
-        ms = bot.reply_to(message, ipl())
+        ms = bot.reply_to(message, ipl(),parse_mode = 'HTML')
         bot.pin_chat_message(message.chat.id,ms.id)
         ipl_list[str(message.chat.id)] = ms.id
     
@@ -1314,7 +1318,7 @@ def ipl_check():
                     if chat_id == 'message':
                         continue
                     chat_id = int(chat_id)
-                    bot.edit_message_text(m,chat_id,ms_id)
+                    bot.edit_message_text(m,chat_id,ms_id,parse_mode = 'HTML')
 
             time.sleep(10)
 
