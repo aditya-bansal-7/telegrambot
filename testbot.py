@@ -32,6 +32,7 @@ giveaways = {}
 
 blacklist = [] 
 
+ipl_list = {'message':"abc"}
 
 MIN_PIN = 0
 MAX_PIN4 = 9999
@@ -988,9 +989,19 @@ def giveaway_handler(message):
         bot.reply_to(message, "You must be an admin to use this command.")
 
 
+
 @bot.message_handler(commands=['ipl'])
 def send_ipl_scores(message):
-    bot.reply_to(message, ipl())
+
+    if str(message.chat.id) in ipl_list.keys():
+        ms = bot.reply_to(message, ipl())
+        bot.pin_chat_message(message.chat.id,ms.id)
+        bot.delete_message(message.chat.id ,ipl_list[str(message.chat.id)])
+        ipl_list[str(message.chat.id)] = ms.id
+    else:
+        ms = bot.reply_to(message, ipl())
+        bot.pin_chat_message(message.chat.id,ms.id)
+        ipl_list[str(message.chat.id)] = ms.id
     
 
 # @bot.message_handler(commands=['rmbg'])
@@ -1293,7 +1304,25 @@ alrt = True
 #                         send_alert = False
 #             time.sleep(60)
 
-# time_thread = threading.Thread(target=gasTimeFunction)
-# time_thread.start()
+
+def ipl_check():
+    with threading.Lock():
+        while True:
+            m = ipl()
+            if m != ipl_list['message']:
+                for chat_id , ms_id in ipl_list:
+                    if chat_id == 'message':
+                        continue
+                    chat_id = int(chat_id)
+                    bot.edit_message_text(m,chat_id,ms_id)
+
+            time.sleep(10)
+
+
+
+
+
+time_thread = threading.Thread(target=ipl_check)
+time_thread.start()
 
 bot.infinity_polling()
